@@ -11,12 +11,12 @@
 What's included
 ---------------
 
-  - bot.py - An implementation of a computer bot for playing the 2048 game.
-  - board.py - A Python class representing an 2048 game board, and implementing various operations on it.
-  - interactive_game.py - A manually playable version of the game (use the arrow keys for playing).
-  - moves.py - An "enum like" class definition used to define the four legal moves of the game.
-  - config.py - Defines serveral global constants (the size of the boards, and the target score for winning).
-  - helpers.py - some helper routines.
+  - __bot.py__ - An implementation of a computer bot for playing the 2048 game.
+  - __board.py__ - A Python class representing an 2048 game board, and implementing various operations on it.
+  - __interactive_game.py__ - A manually playable version of the game (use the arrow keys for playing).
+  - __moves.py__ - An "enum like" class definition used to define the four legal moves of the game.
+  - __config.py__ - Defines serveral global constants (the size of the boards, and the target score for winning).
+  - __helpers.py__ - some helper routines.
 
 
 
