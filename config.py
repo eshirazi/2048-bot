@@ -1,0 +1,1 @@
+BOARD_SIZE = 4
