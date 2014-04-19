@@ -9,12 +9,29 @@ avg = lambda values: sum(values) / len(values)
 
 class Bot(object):
     def get_board_score(self, board):
+        """
+        This is a heuristic trying to give a score to a given board state.
+        Higher scores are given to "better" board constellations.
+
+        This is the heart of the algorithm, and is still the main part that needs
+        to be improved.
+        """
+
+        # The basic score is calculated as the sum of the squares of the tile values on the board.
+        # The idea behind this odd calculation is to give more score to constellations where
+        # the most high values appear. This will for example prefer merging two 128 tiles, instead of merging
+        # two 64 tiles.
+
         score = float(
             sum(
                 (board[y, x] ** 2 for y, x in ALL_TILES),
                 0
             )
         )
+
+        # We also want to give the algorithm a sense of survival. Therefore we
+        # significantly deduct score for "tight" constellations where there's not much room left
+        # on the board. This helps the algorithm try to avoid staying in tight situations for a long time.
 
         num_free_tiles = board.get_free_tiles()
 
@@ -28,8 +45,12 @@ class Bot(object):
         return score
 
 
-
     def get_next_move_simple(self, board):
+        """
+        This strategy simply tries the four possible moves, checks the
+        score of the resulting board constellations, and picks the best out of the four.
+        """
+
         def calc_score_for_move(move):
             board_copy = Board(board)
             try:
@@ -41,6 +62,11 @@ class Bot(object):
         return max(ALL_MOVES, key=calc_score_for_move)
 
     def get_next_move_advanced(self, board, agg_func=avg):
+        """
+        This strategy is similar to the simple one, but tries to "peek into the future".
+        It tries various options that different moves lead to, and chooses a move according to
+        agg_func - a score aggregation function.
+        """
         def calc_score_for_board(board, iteration=1):
             if iteration == max_depth:
                 return self.get_board_score(board)
