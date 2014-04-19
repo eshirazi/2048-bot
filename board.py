@@ -2,9 +2,9 @@ import itertools
 import random
 from config import BOARD_SIZE
 from helpers import irange
-from move import MOVES
+from moves import ALL_MOVES
 
-ALL_INDICES = list(itertools.product(irange(BOARD_SIZE), irange(BOARD_SIZE)))
+ALL_TILES = list(itertools.product(irange(BOARD_SIZE), irange(BOARD_SIZE)))
 
 class IllegalMoveException(Exception):
     pass
@@ -29,7 +29,7 @@ class Board:
                 (2, 2)
             ]))
 
-            for y, x in random.sample(ALL_INDICES, len(initializers)):
+            for y, x in random.sample(ALL_TILES, len(initializers)):
                 self[y, x] = initializers.pop()
         else:
             self.b = [
@@ -47,7 +47,7 @@ class Board:
         self.b[indices[0]][indices[1]] = value
 
     def __repr__(self):
-        cell_size = max(len(str(self[y, x])) for y, x in ALL_INDICES)
+        cell_size = max(len(str(self[y, x])) for y, x in ALL_TILES)
         line_size = (cell_size + 1) * BOARD_SIZE
         sap_line = "+".join("-" * (cell_size + 2) for i in irange(BOARD_SIZE))
 
@@ -67,7 +67,7 @@ class Board:
                 ret += "\n" + sap_line + "\n"
         return ret + "\n"
 
-    def _move_swipe_internal(self, move):
+    def move_only_swipe(self, move):
         move_axis = move.get_move_axis()
         static_axis = move.get_static_axis()
         direction = sum(move.get_dir())
@@ -120,29 +120,46 @@ class Board:
                 elif first_free_idx is None:
                     first_free_idx = j
 
-        return done_something
+        if not done_something:
+            raise IllegalMoveException
 
     def get_legal_moves(self):
         ret = []
-        for move in MOVES:
-            if Board(self)._move_swipe_internal(move):
+        for move in ALL_MOVES:
+            try:
+                Board(self).move_only_swipe(move)
                 ret.append(move)
+            except IllegalMoveException:
+                continue
+
         return ret
 
-    def move_swipe(self, move):
-        if not self._move_swipe_internal(move):
-            raise IllegalMoveException()
+    def has_legal_moves(self):
+        return bool(self.get_legal_moves())
 
     def add_random_tile(self):
         try:
             self[random.choice([
                 (y, x)
-                for (y, x) in ALL_INDICES
+                for (y, x) in ALL_TILES
                 if self[y, x] == 0
             ])] = 2
         except IndexError:
             raise IllegalMoveException()
 
     def move(self, move):
-        self.move_swipe(move)
+        self.move_only_swipe(move)
         self.add_random_tile()
+
+    def has_tile(self, value):
+        for y, x in ALL_TILES:
+            if self[y, x] == value:
+                return True
+
+        return False
+
+    def get_max_tile(self):
+        return max(self[y, x] for y, x in ALL_TILES)
+
+    def get_free_tiles(self):
+        return ((y, x) for y, x in ALL_TILES if self[y, x] == 0)

@@ -20,4 +20,4 @@ DOWN = Move(1, 0, "DOWN")
 RIGHT = Move(0, 1, "RIGHT")
 LEFT = Move(0, -1, "LEFT")
 
-MOVES = (UP, DOWN, RIGHT, LEFT)
+ALL_MOVES = (UP, DOWN, RIGHT, LEFT)

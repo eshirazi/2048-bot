@@ -1,11 +1,11 @@
 from board import Board, IllegalMoveException
-import move
+import moves
 
 KEY_TO_MOVE = {
-    "Up": move.UP,
-    "Down": move.DOWN,
-    "Left": move.LEFT,
-    "Right": move.RIGHT,
+    "Up": moves.UP,
+    "Down": moves.DOWN,
+    "Left": moves.LEFT,
+    "Right": moves.RIGHT,
 }
 
 
@@ -28,7 +28,7 @@ def start_interactive_game():
             except IllegalMoveException:
                 pass
 
-        if event.keysym == 'Escape' or not a.get_legal_moves():
+        if event.keysym == 'Escape' or not a.has_legal_moves():
             root.destroy()
 
     root = tk.Tk()
