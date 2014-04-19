@@ -9,19 +9,24 @@ avg = lambda values: sum(values) / len(values)
 
 class Bot(object):
     def get_board_score(self, board):
-        # return float(
-        #     sum(
-        #         ((1 if board[y, x] == 0 else 0) for y, x in ALL_INDICES),
-        #         0
-        #     )
-        # )
-
-        return float(
+        score = float(
             sum(
                 (board[y, x] ** 2 for y, x in ALL_TILES),
                 0
             )
         )
+
+        num_free_tiles = board.get_free_tiles()
+
+        if num_free_tiles < 4:
+            score /= 2
+        if num_free_tiles < 2:
+            score /= 2
+        if num_free_tiles < 1:
+            score /= 2
+
+        return score
+
 
 
     def get_next_move_simple(self, board):
@@ -35,9 +40,9 @@ class Bot(object):
 
         return max(ALL_MOVES, key=calc_score_for_move)
 
-    def get_next_move_advanced(self, board, depth=3, agg_func=avg):
+    def get_next_move_advanced(self, board, agg_func=avg):
         def calc_score_for_board(board, iteration=1):
-            if iteration == depth:
+            if iteration == max_depth:
                 return self.get_board_score(board)
 
             scores = []
@@ -72,6 +77,17 @@ class Bot(object):
                 return calc_score_for_board(cur_board)
             except IllegalMoveException:
                 return -10.0
+
+        num_free_tiles_left = board.get_num_free_tiles() - 1
+
+        if num_free_tiles_left == 0:
+            max_depth = 5
+        elif num_free_tiles_left < 2:
+            max_depth = 4
+        elif num_free_tiles_left < 7:
+            max_depth = 3
+        else:
+            max_depth = 2
 
         return max(ALL_MOVES, key=calc_score_for_move)
 

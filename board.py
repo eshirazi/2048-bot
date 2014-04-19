@@ -163,3 +163,6 @@ class Board:
 
     def get_free_tiles(self):
         return ((y, x) for y, x in ALL_TILES if self[y, x] == 0)
+
+    def get_num_free_tiles(self):
+        return sum(1 for tile in self.get_free_tiles())
