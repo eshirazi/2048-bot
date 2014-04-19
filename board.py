@@ -1,9 +1,10 @@
 import itertools
 import random
 from config import BOARD_SIZE
+from helpers import irange
 from move import MOVES
 
-ALL_INDICES = list(itertools.product(range(BOARD_SIZE), range(BOARD_SIZE)))
+ALL_INDICES = list(itertools.product(irange(BOARD_SIZE), irange(BOARD_SIZE)))
 
 class IllegalMoveException(Exception):
     pass
@@ -13,8 +14,8 @@ class Board:
 
     def clear(self):
         self.b = [
-            [0 for j in range(BOARD_SIZE)]
-            for i in range(BOARD_SIZE)
+            [0 for j in irange(BOARD_SIZE)]
+            for i in irange(BOARD_SIZE)
         ]
 
     def __init__(self, init_board = None):
@@ -34,9 +35,9 @@ class Board:
             self.b = [
                 [
                     init_board[y, x]
-                    for x in range(BOARD_SIZE)
+                    for x in irange(BOARD_SIZE)
                 ]
-                for y in range(BOARD_SIZE)
+                for y in irange(BOARD_SIZE)
             ]
 
     def __getitem__(self, indices):
@@ -48,11 +49,11 @@ class Board:
     def __repr__(self):
         cell_size = max(len(str(self[y, x])) for y, x in ALL_INDICES)
         line_size = (cell_size + 1) * BOARD_SIZE
-        sap_line = "+".join("-" * (cell_size + 2) for i in range(BOARD_SIZE))
+        sap_line = "+".join("-" * (cell_size + 2) for i in irange(BOARD_SIZE))
 
         ret = ""
-        for y in range(BOARD_SIZE):
-            for x in range(BOARD_SIZE):
+        for y in irange(BOARD_SIZE):
+            for x in irange(BOARD_SIZE):
                 if self[y, x] != 0:
                     ret += " " + (" " * cell_size + str(self[y, x]))[-cell_size:] + " "
                 else:
@@ -90,12 +91,12 @@ class Board:
         def put(i, j, value):
             self[conv_i_j(i, j)] = value
 
-        for i in range(BOARD_SIZE):
+        for i in irange(BOARD_SIZE):
             last_stumbled = None
             last_stumbled_idx = None
             first_free_idx = None
 
-            for j in range(BOARD_SIZE):
+            for j in irange(BOARD_SIZE):
                 cur = get(i, j)
 
                 if cur != 0:

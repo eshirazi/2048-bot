@@ -1,5 +1,3 @@
-import itertools
-import random
 from board import Board, IllegalMoveException
 import move
 
