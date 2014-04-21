@@ -10,3 +10,5 @@ def shuffle(thing):
     ret = list(thing)
     random.shuffle(ret)
     return ret
+
+average = lambda values: sum(values) / len(values)

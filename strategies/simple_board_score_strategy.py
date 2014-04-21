@@ -10,4 +10,4 @@ class SimpleBoardScoreStrategy(BaseBoardScoreStrategy):
     def calc_score_for_move(self, board, move):
         board_copy = Board(board)
         board_copy.move_only_swipe(move)
-        return self._board_score_heuristic.get_board_score(board_copy)
+        return self._board_score_heuristic(board_copy)

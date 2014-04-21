@@ -1,8 +1,8 @@
+from Tkconstants import LEFT
 from board import Board, IllegalMoveException
-from moves import ALL_MOVES
+from helpers import average
+from moves import ALL_MOVES, UP
 from strategies.base_board_score_strategy import BaseBoardScoreStrategy
-
-average = lambda values: sum(values) / len(values)
 
 
 class AdvancedBoardScoreStrategy(BaseBoardScoreStrategy):
@@ -12,24 +12,31 @@ class AdvancedBoardScoreStrategy(BaseBoardScoreStrategy):
     agg_func - a score aggregation function.
     """
 
+    def __init__(self, board_score_heuristic, depth_modifier=0, agg_func=average):
+        super(AdvancedBoardScoreStrategy, self).__init__(board_score_heuristic)
+        self._depth_modifier = depth_modifier
+        self._agg_func = agg_func
+
     def calc_max_depth(self, board):
         num_free_tiles_left = board.get_num_free_tiles()
 
-        if num_free_tiles_left < 3:
+        if num_free_tiles_left < 2:
+            max_depth = 5
+        elif num_free_tiles_left < 4:
             max_depth = 4
         elif num_free_tiles_left < 8:
             max_depth = 3
         else:
             max_depth = 2
 
-        return max_depth
+        return max(max_depth + self._depth_modifier, 1)
 
-    def calc_score_for_board(self, board, agg_func=average, iteration=1, max_depth=None):
+    def calc_score_for_board(self, board, iteration=1, max_depth=None):
         if max_depth is None:
             max_depth = self.calc_max_depth(board)
 
         if iteration == max_depth:
-            return self._board_score_heuristic.get_board_score(board)
+            return self._board_score_heuristic(board)
 
         scores = []
 
@@ -53,7 +60,6 @@ class AdvancedBoardScoreStrategy(BaseBoardScoreStrategy):
                 scores.append(
                     self.calc_score_for_board(
                         move_board,
-                        agg_func=agg_func,
                         iteration=iteration + 1,
                         max_depth=max_depth
                     )
@@ -63,12 +69,13 @@ class AdvancedBoardScoreStrategy(BaseBoardScoreStrategy):
                 scores.append(-1)
 
         if scores:
-            return agg_func(scores)
+            return self._agg_func(scores)
         return -1
 
     def calc_score_for_move(self, board, move):
         cur_board = Board(board)
         cur_board.move_only_swipe(move)
+
         return self.calc_score_for_board(
             cur_board
         )
