@@ -5,6 +5,7 @@ from helpers import irange
 from moves import ALL_MOVES
 
 ALL_TILES = list(itertools.product(irange(BOARD_SIZE), irange(BOARD_SIZE)))
+POSSIBLE_NEW_TILES = [4] + ([2] * 9)
 
 class IllegalMoveException(Exception):
     pass
@@ -139,11 +140,7 @@ class Board:
 
     def add_random_tile(self):
         try:
-            self[random.choice([
-                (y, x)
-                for (y, x) in ALL_TILES
-                if self[y, x] == 0
-            ])] = 2
+            self[random.choice(tuple(self.get_free_tiles()))] = random.choice(POSSIBLE_NEW_TILES)
         except IndexError:
             raise IllegalMoveException()
 

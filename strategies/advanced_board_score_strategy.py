@@ -1,9 +1,9 @@
-from Tkconstants import LEFT
 from board import Board, IllegalMoveException
-from helpers import average
+from helpers import tuple_not_implemented, tuple_max, tuple_weighted_average, tuple_min
 from moves import ALL_MOVES, UP
 from strategies.base_board_score_strategy import BaseBoardScoreStrategy
 
+DEFAULT_ILLEGAL_MOVE_SCORE = -1
 
 class AdvancedBoardScoreStrategy(BaseBoardScoreStrategy):
     """
@@ -12,70 +12,147 @@ class AdvancedBoardScoreStrategy(BaseBoardScoreStrategy):
     agg_func - a score aggregation function.
     """
 
-    def __init__(self, board_score_heuristic, depth_modifier=0, agg_func=average):
+    def __init__(
+            self,
+            board_score_heuristic,
+            depth_modifier=0,
+            alpha_agg_func=tuple_not_implemented,
+            beta_agg_func=tuple_not_implemented,
+            illegal_move_score=DEFAULT_ILLEGAL_MOVE_SCORE
+    ):
         super(AdvancedBoardScoreStrategy, self).__init__(board_score_heuristic)
         self._depth_modifier = depth_modifier
-        self._agg_func = agg_func
+        self._alpha_agg_func = alpha_agg_func
+        self._beta_agg_func = beta_agg_func
+        self._illegal_move_score = illegal_move_score
 
     def calc_max_depth(self, board):
         num_free_tiles_left = board.get_num_free_tiles()
 
-        if num_free_tiles_left < 2:
-            max_depth = 5
-        elif num_free_tiles_left < 4:
-            max_depth = 4
-        elif num_free_tiles_left < 8:
-            max_depth = 3
-        else:
-            max_depth = 2
+        return max(
+            {
+                0: 8,
+                1: 7,
+                2: 6,
+                3: 5,
+                4: 4,
+                5: 4,
+                6: 3,
+                7: 3,
+                8: 3,
+                9: 3,
+                10: 2,
+                11: 2,
+                12: 2,
+                13: 2,
+                14: 2,
+                15: 2,
+            }[num_free_tiles_left]
+            + self._depth_modifier,
+            1
+        )
 
-        return max(max_depth + self._depth_modifier, 1)
-
-    def calc_score_for_board(self, board, iteration=1, max_depth=None):
-        if max_depth is None:
-            max_depth = self.calc_max_depth(board)
-
+    def calc_alpha_score(self, board, iteration, max_depth):
         if iteration == max_depth:
             return self._board_score_heuristic(board)
 
         scores = []
 
-        for tile in board.get_free_tiles():
-            cur_board = Board(board)
-            cur_board[tile] = 2
+        for move in ALL_MOVES:
+            next_board = Board(board)
 
-            legal_move_found = False
-
-            for move in ALL_MOVES:
-                move_board = Board(cur_board)
-
-                try:
-                    move_board.move_only_swipe(move)
-                except IllegalMoveException:
-                    # Only counting possible moves
-                    continue
-
-                legal_move_found = True
-
+            try:
+                next_board.move_only_swipe(move)
+            except IllegalMoveException:
                 scores.append(
-                    self.calc_score_for_board(
-                        move_board,
+                    (
+                        self._illegal_move_score,
+                        1
+                    )
+                )
+                # Only counting possible moves
+                continue
+
+            scores.append(
+                (
+                    self.calc_beta_score(
+                        next_board,
                         iteration=iteration + 1,
                         max_depth=max_depth
+                    ),
+                    1
+                )
+            )
+
+        return self._alpha_agg_func(scores)
+
+    def calc_beta_score(self, board, iteration, max_depth):
+        if iteration == max_depth:
+            return self._board_score_heuristic(board)
+
+        scores = []
+
+        for new_tile_value, probability in ((2, 9), (4, 1)):
+            for tile in board.get_free_tiles():
+                next_board = Board(board)
+
+                next_board[tile] = new_tile_value
+
+                scores.append(
+                    (
+                        self.calc_alpha_score(
+                            next_board,
+                            iteration=iteration + 1,
+                            max_depth=max_depth
+                        ),
+                        probability
                     )
                 )
 
-            if not legal_move_found:
-                scores.append(-1)
-
-        if scores:
-            return self._agg_func(scores)
-        return -1
+        return self._beta_agg_func(scores)
 
     def calc_score_for_move(self, board, move):
-        cur_board = Board(board)
-        cur_board.move_only_swipe(move)
+        max_depth = self.calc_max_depth(board)
 
-        return self.calc_score_for_board(
-            cur_board
+        next_board = Board(board)
+        next_board.move_only_swipe(move)
+
+        return self.calc_beta_score(
+            next_board,
+            1,
+            max_depth=max_depth
+        )
+
+class MinimaxStrategy(AdvancedBoardScoreStrategy):
+    def __init__(
+            self,
+            board_score_heuristic,
+            depth_modifier=0,
+            alpha_agg_func=tuple_max,
+            beta_agg_func=tuple_min,
+            illegal_move_score=DEFAULT_ILLEGAL_MOVE_SCORE
+    ):
+        super(MinimaxStrategy, self).__init__(
+            board_score_heuristic,
+            depth_modifier,
+            alpha_agg_func,
+            beta_agg_func,
+            illegal_move_score
+        )
+
+class ExpectimaxStrategy(AdvancedBoardScoreStrategy):
+    def __init__(
+            self,
+            board_score_heuristic,
+            depth_modifier=0,
+            alpha_agg_func=tuple_max,
+            beta_agg_func=tuple_weighted_average,
+            illegal_move_score=DEFAULT_ILLEGAL_MOVE_SCORE
+    ):
+        super(ExpectimaxStrategy, self).__init__(
+            board_score_heuristic,
+            depth_modifier,
+            alpha_agg_func,
+            beta_agg_func,
+            illegal_move_score
         )

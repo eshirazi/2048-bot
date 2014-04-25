@@ -1,11 +1,8 @@
-import math
 from board import ALL_TILES, Board
 from bot import Bot
-from helpers import irange, average
-from strategies.advanced_board_score_strategy import AdvancedBoardScoreStrategy
-from strategies.board_score_heuristics.best import ace_heuristic
-from strategies.board_score_heuristics.side_sticky import side_sticky_heuristic
-from strategies.board_score_heuristics.sum_square import sum_square_heuristic
+from helpers import irange
+from strategies.advanced_board_score_strategy import ExpectimaxStrategy, MinimaxStrategy
+from strategies.board_score_heuristics.best import ace_heuristic, supxtra_heuristic
 
 
 def get_final_board_score(board):
@@ -50,10 +47,9 @@ def benchmark_strategy(strategy, rounds=25, show_logs=True):
 
 if __name__ == "__main__":
     benchmark_strategy(
-        AdvancedBoardScoreStrategy(
-            ace_heuristic,
-            depth_modifier=0,
-            agg_func=lambda scores: average(scores)
+        ExpectimaxStrategy(
+            supxtra_heuristic,
+            depth_modifier=-1,
         ),
         rounds=50,
         show_logs=True
