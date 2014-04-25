@@ -32,10 +32,20 @@ class Board:
 
             for y, x in random.sample(ALL_TILES, len(initializers)):
                 self[y, x] = initializers.pop()
-        else:
+        elif isinstance(init_board, Board):
+            # Copy constructor
             self.b = [
                 [
                     init_board[y, x]
+                    for x in irange(BOARD_SIZE)
+                ]
+                for y in irange(BOARD_SIZE)
+            ]
+        else:
+            # Copy from lists
+            self.b = [
+                [
+                    init_board[y][x]
                     for x in irange(BOARD_SIZE)
                 ]
                 for y in irange(BOARD_SIZE)

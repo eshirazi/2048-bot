@@ -2,7 +2,7 @@ import time
 from board import Board, IllegalMoveException, ALL_TILES
 from config import WIN_VALUE, NEVER_STOP
 from strategies.advanced_board_score_strategy import ExpectimaxStrategy
-from strategies.board_score_heuristics.best import ace_heuristic, supxtra_heuristic
+from strategies.board_score_heuristics.best import ace_heuristic, supxtra_heuristic, perfect_heuristic
 
 
 class Bot(object):
@@ -37,8 +37,8 @@ if __name__ == "__main__":
 
     success = Bot(
         ExpectimaxStrategy(
-            supxtra_heuristic,
-            depth_modifier=0,
+            perfect_heuristic,
+            depth_modifier=-1,
         )
     ).play(board, show_steps=True, stop_at=NEVER_STOP)
 

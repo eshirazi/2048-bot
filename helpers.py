@@ -1,15 +1,13 @@
-# Use an iterator version of xrange whether it's Python 3 or 2
-import random
+import itertools
 
+# Use an iterator version of xrange whether it's Python 3 or 2
 try:
     irange = xrange
 except:
     irange = range
 
-def shuffle(thing):
-    ret = list(thing)
-    random.shuffle(ret)
-    return ret
+tuplify = lambda gen: lambda *args, **kwargs: tuple(gen(*args, **kwargs))
+chop_generator = lambda n: lambda gen: lambda *args, **kwargs: itertools.islice(gen(*args, **kwargs), n)
 
 # functions for working with (score, probability tuples)
 tuple_max = lambda tuples: max(tuples, key=lambda x: x[0])[0]
