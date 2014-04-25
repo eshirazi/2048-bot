@@ -1,6 +1,7 @@
 import time
 from board import ALL_TILES, Board
 from bot import Bot
+from config import WIN_VALUE, NEVER_STOP
 from helpers import irange
 from strategies.advanced_board_score_strategy import ExpectimaxStrategy, MinimaxStrategy
 from strategies.board_score_heuristics.best import ace_heuristic, supxtra_heuristic, perfect_heuristic
@@ -11,7 +12,7 @@ def get_final_board_score(board):
 
     return l.pop()
 
-def benchmark_strategy(strategy, rounds=25, show_logs=True):
+def benchmark_strategy(strategy, rounds=25, show_logs=True, stop_at=WIN_VALUE):
     def dbg_print(text):
         if show_logs:
             print(text)
@@ -25,7 +26,7 @@ def benchmark_strategy(strategy, rounds=25, show_logs=True):
 
         start_time = time.time()
 
-        bot.play(board, show_steps=False)
+        bot.play(board, show_steps=False, stop_at=stop_at)
 
         final_board_score = get_final_board_score(board)
 
@@ -53,8 +54,9 @@ if __name__ == "__main__":
     benchmark_strategy(
         ExpectimaxStrategy(
             perfect_heuristic,
-            depth_modifier=0,
+            depth_modifier=-1,
         ),
         rounds=250,
-        show_logs=True
+        show_logs=True,
+        stop_at=NEVER_STOP
     )

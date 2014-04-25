@@ -4,6 +4,10 @@ from strategies.board_score_heuristics.side_sticky import side_sticky_heuristic,
 from strategies.board_score_heuristics.snake_order import snake_order_heuristic, snake_decay_order_heuristic
 from strategies.board_score_heuristics.sum_square import sum_square_heuristic
 
+# Gets to higher grades
 perfect_heuristic = lambda board: snake_decay_order_heuristic(board) * 10 + sqrt(sum_square_heuristic(board))
+
+# Good at gettting to 2048 but not so much after that
 supxtra_heuristic = lambda board: sqrt(sum_square_heuristic(board)) + side_smooth_sticky_heuristic(board)
+
 ace_heuristic = lambda board: sum_square_heuristic(board) + side_sticky_heuristic(board)

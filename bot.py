@@ -38,7 +38,7 @@ if __name__ == "__main__":
     success = Bot(
         ExpectimaxStrategy(
             perfect_heuristic,
-            depth_modifier=-1,
+            depth_modifier=0,
         )
     ).play(board, show_steps=True, stop_at=NEVER_STOP)
 
