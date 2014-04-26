@@ -10,10 +10,10 @@ def side_sticky_heuristic(board):
     board_sum = sum(board[y, x] for y, x in ALL_TILES)
 
     max_side_sum = max(
-        sum(board[i, 0] for i in irange(4)),
-        sum(board[i, BOARD_SIZE - 1] for i in irange(4)),
-        sum(board[0, i] for i in irange(4)),
-        sum(board[BOARD_SIZE - 1, i] for i in irange(4))
+        sum(board[i, 0] for i in irange(BOARD_SIZE)),
+        sum(board[i, BOARD_SIZE - 1] for i in irange(BOARD_SIZE)),
+        sum(board[0, i] for i in irange(BOARD_SIZE)),
+        sum(board[BOARD_SIZE - 1, i] for i in irange(BOARD_SIZE))
     )
 
     if (board_sum - max_side_sum) == 0 or max_side_sum / (board_sum - max_side_sum) >= 3.0:
@@ -73,10 +73,10 @@ def side_smooth_sticky_heuristic(board):
         return score
 
     edges = (
-        [board[i, 0] for i in irange(4)],
-        [board[i, BOARD_SIZE - 1] for i in irange(4)],
-        [board[0, i] for i in irange(4)],
-        [board[BOARD_SIZE - 1, i] for i in irange(4)]
+        [board[i, 0] for i in irange(BOARD_SIZE)],
+        [board[i, BOARD_SIZE - 1] for i in irange(BOARD_SIZE)],
+        [board[0, i] for i in irange(BOARD_SIZE)],
+        [board[BOARD_SIZE - 1, i] for i in irange(BOARD_SIZE)]
     )
 
     return max(score_for_edge(edge) for edge in edges)

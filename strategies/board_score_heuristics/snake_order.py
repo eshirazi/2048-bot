@@ -21,7 +21,7 @@ def vec_rotate(vec, rotate_orientation):
 
 
 @tuplify
-@chop_generator(16)
+@chop_generator(BOARD_SIZE * BOARD_SIZE)
 def snake_path(origin, start_direction, rotate_orientation):
     pos = origin
     d = start_direction
