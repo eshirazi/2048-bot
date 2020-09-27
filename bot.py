@@ -16,17 +16,17 @@ class Bot(object):
         """
         while board.has_legal_moves() and not board.has_tile(stop_at):
             if show_steps:
-                print repr(board)
+                print(repr(board))
 
             next_move = self._strategy.get_next_move(board)
 
             if show_steps:
-                print "Chosen move:", next_move
+                print("Chosen move:", next_move)
 
             board.move(next_move)
 
         if show_steps:
-            print repr(board)
+            print(repr(board))
 
         return board.get_max_tile() >= WIN_VALUE
 
@@ -44,5 +44,5 @@ if __name__ == "__main__":
 
     duration = int(time.time() - start_time)
 
-    print "Time %02d:%02d:%02d" % (duration / 60 / 60, (duration / 60) % 60, duration % 60)
-    print "Success!" if success else "Failure!", "({})".format(board.get_max_tile())
+    print("Time %02d:%02d:%02d" % (duration / 60 / 60, (duration / 60) % 60, duration % 60))
+    print("Success!" if success else "Failure!", "({})".format(board.get_max_tile()))
